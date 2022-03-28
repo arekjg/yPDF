@@ -31,18 +31,16 @@ def write_data_to_pdf():
         project_num = project_entry.get()
         
         for i in range(1,num_g+1):
-            if sheet[f"A{i}"].value.replace(str(project_num), "").replace("/00", "").replace("/0", "").replace("/", "").replace(" ", "") not in pairs:
-                pairs[sheet[f"A{i}"].value.replace(str(project_num), "").replace("/00", "").replace("/0", "").replace("/", "").replace(" ", "")] = (sheet[f"B{i}"].value)
-            elif isinstance(pairs[sheet[f"A{i}"].value.replace(str(project_num), "").replace("/00", "").replace("/0", "").replace("/", "").replace(" ", "")], list):
-                pairs[sheet[f"A{i}"].value.replace(str(project_num), "").replace("/00", "").replace("/0", "").replace("/", "").replace(" ", "")].append(sheet[f"B{i}"].value)
+            if sheet[f"A{i}"].value not in pairs:
+                pairs[sheet[f"A{i}"].value] = (sheet[f"B{i}"].value)
+            elif isinstance(pairs[sheet[f"A{i}"].value], list):
+                pairs[sheet[f"A{i}"].value].append(sheet[f"B{i}"].value)
                 # deleting duplicates in each list
-                pairs[sheet[f"A{i}"].value.replace(str(project_num), "").replace("/00", "").replace("/0", "").replace("/", "").replace(" ", "")] = list(dict.fromkeys(pairs[sheet[f"A{i}"].value.replace(str(project_num), "").replace("/00", "").replace("/0", "").replace("/", "").replace(" ", "")]))
+                pairs[sheet[f"A{i}"].value] = list(dict.fromkeys(pairs[sheet[f"A{i}"].value]))
                 # sorting each list
-                pairs[sheet[f"A{i}"].value.replace(str(project_num), "").replace("/00", "").replace("/0", "").replace("/", "").replace(" ", "")].sort()
+                pairs[sheet[f"A{i}"].value].sort()
             else:
-                pairs[sheet[f"A{i}"].value.replace(str(project_num), "").replace("/00", "").replace("/0", "").replace("/", "").replace(" ", "")] = [pairs[sheet[f"A{i}"].value.replace(str(project_num), "").replace("/00", "").replace("/0", "").replace("/", "").replace(" ", "")], (sheet[f"B{i}"].value)]
-
-
+                pairs[sheet[f"A{i}"].value] = [pairs[sheet[f"A{i}"].value], (sheet[f"B{i}"].value)]
 
         # creating list of page numbers (keys) to determine max page number
         keys = []
@@ -72,9 +70,9 @@ def write_data_to_pdf():
             page_h = sizes[i+1][1]
             cell_w = 0.18
             space_left = 0.08
-            if pairs.get(f"{i+1}") == None:
+            if pairs.get(i+1) == None:
                 temp_pdf.add_page(format = (page_w, page_h))
-            elif type(pairs[f"{i+1}"]) is str:
+            elif type(pairs[i+1]) is str:
                 temp_pdf.set_font("", "B", size=int(page_h/33.1))
                 temp_pdf.set_text_color(255, 0, 0)
                 temp_pdf.set_draw_color(255, 0, 0)
@@ -82,7 +80,7 @@ def write_data_to_pdf():
                 temp_pdf.set_line_width(3)
                 temp_pdf.add_page(format = (page_w, page_h))
                 temp_pdf.cell(int((1-space_left-cell_w)*page_w), int((page_h)/36), ln=0)
-                temp_pdf.cell(int(cell_w*page_w), int((page_h)/36), txt=str(pairs[f"{i+1}"]), ln=0, border=1, fill=1, align="C")
+                temp_pdf.cell(int(cell_w*page_w), int((page_h)/36), txt=str(pairs[i+1]), ln=0, border=1, fill=1, align="C")
                 if doc_num == "":
                     pass
                 else:
@@ -99,15 +97,15 @@ def write_data_to_pdf():
                 temp_pdf.set_fill_color(255, 255, 255)
                 temp_pdf.set_line_width(3)
                 temp_pdf.add_page(format = (page_w, page_h))
-                if len(pairs[f"{i+1}"]) == 2:
+                if len(pairs[i+1]) == 2:
                     temp_pdf.cell(int((1-space_left-(2*cell_w))*page_w), int((page_h)/36), ln=0)
-                    temp_pdf.cell(int(cell_w*page_w), int((page_h)/36), txt=str((pairs[f"{i+1}"])[0]), ln=0, border=1, fill=1, align="C")
-                    temp_pdf.cell(int(cell_w*page_w), int((page_h)/36), txt=str((pairs[f"{i+1}"])[1]), ln=0, border=1, fill=1, align="C")
-                elif len(pairs[f"{i+1}"]) == 3:
+                    temp_pdf.cell(int(cell_w*page_w), int((page_h)/36), txt=str((pairs[i+1])[0]), ln=0, border=1, fill=1, align="C")
+                    temp_pdf.cell(int(cell_w*page_w), int((page_h)/36), txt=str((pairs[i+1])[1]), ln=0, border=1, fill=1, align="C")
+                elif len(pairs[i+1]) == 3:
                     temp_pdf.cell(int((1-space_left-(3*cell_w))*(page_w)), int((page_h)/36), ln=0)
-                    temp_pdf.cell(int(cell_w*page_w), int((page_h)/36), txt=str((pairs[f"{i+1}"])[0]), ln=0, border=1, fill=1, align="C")
-                    temp_pdf.cell(int(cell_w*page_w), int((page_h)/36), txt=str((pairs[f"{i+1}"])[1]), ln=0, border=1, fill=1, align="C")
-                    temp_pdf.cell(int(cell_w*page_w), int((page_h)/36), txt=str((pairs[f"{i+1}"])[2]), ln=0, border=1, fill=1, align="C")
+                    temp_pdf.cell(int(cell_w*page_w), int((page_h)/36), txt=str((pairs[i+1])[0]), ln=0, border=1, fill=1, align="C")
+                    temp_pdf.cell(int(cell_w*page_w), int((page_h)/36), txt=str((pairs[i+1])[1]), ln=0, border=1, fill=1, align="C")
+                    temp_pdf.cell(int(cell_w*page_w), int((page_h)/36), txt=str((pairs[i+1])[2]), ln=0, border=1, fill=1, align="C")
                 if doc_num == "":
                     pass
                 else:
