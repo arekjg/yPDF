@@ -5,30 +5,43 @@ from PyPDF2 import PdfFileWriter, PdfFileReader
 import os
 from tkinter import *
 from tkinter import filedialog
+import xlwings as xw
 
 def load_excel():
-    global excelpath
-    excelpath = filedialog.askopenfile(filetypes = [("Excel files", "*.xlsx"), ("Excel files", "*.xlsm")])
-    ex_info.set(excelpath.name)
+    # getting path to CSV file
+    global csvpath
+    csvpath = filedialog.askopenfile(filetypes = [("CSV files", "*.csv")])
+    ex_info.set(csvpath.name)
     label_message.set("")
 
 def load_pdf():
+    # getting path to PDF file
     global pdfpath
     pdfpath = filedialog.askopenfile(filetypes = [("PDF files", "*.pdf")])
     pdf_info.set(pdfpath.name)
     label_message.set("")
 
+def run_macro():
+    # copying data from CSV file to yPDF.xlsm
+    projectNum = project_entry.get()
+    wb = xw.Book("yPDF.xlsm")
+    app = xw.apps.active
+    # running macro, saving and closing Excel window
+    macro1 = wb.macro("Module1.yPDF")
+    macro1(projectNum, csvpath.name)
+    wb.save()
+    app.quit()
+
 def write_data_to_pdf():
     label_message.set("")
     try:
-        # loading excel file
-        wb = openpyxl.load_workbook(excelpath.name)
+        # loading yPDF.xlsm file
+        wb = openpyxl.load_workbook("yPDF.xlsm")
         sheet = wb[wb.sheetnames[0]]
         num_g = sheet.max_row
 
         # creating dictionary with data from excel, deleting useless text
         pairs = {}
-        project_num = project_entry.get()
         
         for i in range(1,num_g+1):
             if sheet[f"A{i}"].value not in pairs:
@@ -97,7 +110,10 @@ def write_data_to_pdf():
                 temp_pdf.set_fill_color(255, 255, 255)
                 temp_pdf.set_line_width(3)
                 temp_pdf.add_page(format = (page_w, page_h))
-                if len(pairs[i+1]) == 2:
+                if len(pairs[i+1]) == 1:
+                    temp_pdf.cell(int((1-space_left-(cell_w))*page_w), int((page_h)/36), ln=0)
+                    temp_pdf.cell(int(cell_w*page_w), int((page_h)/36), txt=str((pairs[i+1])[0]), ln=0, border=1, fill=1, align="C")
+                elif len(pairs[i+1]) == 2:
                     temp_pdf.cell(int((1-space_left-(2*cell_w))*page_w), int((page_h)/36), ln=0)
                     temp_pdf.cell(int(cell_w*page_w), int((page_h)/36), txt=str((pairs[i+1])[0]), ln=0, border=1, fill=1, align="C")
                     temp_pdf.cell(int(cell_w*page_w), int((page_h)/36), txt=str((pairs[i+1])[1]), ln=0, border=1, fill=1, align="C")
@@ -170,14 +186,13 @@ def write_data_to_pdf():
 
 
 root = Tk()
-root.geometry("720x130")
+root.geometry("720x160")
 root.title("yPDF")
 root.resizable(False, False)
 
 label_message = StringVar()
 ex_info = StringVar()
 pdf_info = StringVar()
-font_color = StringVar()
 
 FONT = ("Arial", 10)
 
@@ -202,7 +217,7 @@ label_doc.pack(side=RIGHT)
 frame2 = Frame(root)
 frame2.pack(pady=5)
 
-ex_button = Button(frame2, text="Load Excel file", font=FONT, command=load_excel, width=20)
+ex_button = Button(frame2, text="Load CSV file", font=FONT, command=load_excel, width=20)
 ex_button.grid(row=1, column=0, padx=5)
 
 label_ex = Label(frame2, textvariable=ex_info, font=FONT, borderwidth=2, relief="groove", width=60, height=1)
@@ -214,10 +229,13 @@ pdf_button.grid(row=2, column=0, padx=5)
 label_pdf = Label(frame2, textvariable=pdf_info, font=FONT, borderwidth=2, relief="groove", width=60, height=1)
 label_pdf.grid(row=2, column=1, padx=5)
 
-data_button = Button(frame2, text="Extract data to PDF", font=FONT, command=write_data_to_pdf, width=20)
-data_button.grid(row=3, column=0, padx=5)
+macro_button = Button(frame2, text="Run macro", font=FONT, command=run_macro, width=20)
+macro_button.grid(row=3, column=0, padx=5)
 
 label_info = Label(frame2, textvariable=label_message, font=("Arial", 10, "bold"), width=60, height=1)
 label_info.grid(row=3, column=1, padx=5)
+
+data_button = Button(frame2, text="Extract data to PDF", font=FONT, command=write_data_to_pdf, width=20)
+data_button.grid(row=4, column=0, padx=5)
 
 root.mainloop()
