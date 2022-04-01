@@ -3,7 +3,7 @@ import openpyxl
 import PyPDF2
 from PyPDF2 import PdfFileWriter, PdfFileReader
 import os
-from tkinter import *
+import tkinter as tk
 from tkinter import filedialog
 import xlwings as xw
 
@@ -22,15 +22,31 @@ def load_pdf():
     label_message.set("")
 
 def run_macro():
+    if check_var.get() == 0:
+        macro1()
+    else:
+        macro2()
+
+def macro1():
     # copying data from CSV file to yPDF.xlsm
     projectNum = project_entry.get()
     wb = xw.Book("yPDF.xlsm")
     app = xw.apps.active
-    # running macro, saving and closing Excel window
-    macro1 = wb.macro("Module1.yPDF")
-    macro1(projectNum, csvpath.name)
+    # running macro, saving and closing excel window
+    m1 = wb.macro("Module1.yPDF")
+    m1(projectNum, csvpath.name)
     wb.save()
     app.quit()
+
+def macro2():
+    # copying data from CSV file to yPDF.xlsm
+    projectNum = project_entry.get()
+    wb = xw.Book("yPDF.xlsm")
+    app = xw.apps.active
+    # running macro
+    m2 = wb.macro("Module2.yPDF")
+    m2(projectNum, csvpath.name)
+
 
 def write_data_to_pdf():
     label_message.set("")
@@ -185,57 +201,60 @@ def write_data_to_pdf():
         label_message.set("Something went wrong :(")
 
 
-root = Tk()
+root = tk.Tk()
 root.geometry("720x160")
 root.title("yPDF")
 root.resizable(False, False)
 
-label_message = StringVar()
-ex_info = StringVar()
-pdf_info = StringVar()
+label_message = tk.StringVar()
+ex_info = tk.StringVar()
+pdf_info = tk.StringVar()
+check_var = tk.IntVar()
 
 FONT = ("Arial", 10)
 
-frame1 = Frame(root, width=400, height=28)
+frame1 = tk.Frame(root, width=400, height=28)
 frame1.pack()
 frame1.pack_propagate(0)
 
 
-label_num = Label(frame1, text="Project number:", font=FONT, width=12)
-label_num.pack(side=LEFT)
+label_num = tk.Label(frame1, text="Project number:", font=FONT, width=12)
+label_num.grid(row=0, column=0)
 
-project_entry = Entry(frame1, font=FONT, width=12)
-project_entry.pack(side=LEFT)
+project_entry = tk.Entry(frame1, font=FONT, width=12)
+project_entry.grid(row=0, column=1)
 
-doc_entry = Entry(frame1, font=FONT, width=5)
-doc_entry.pack(side=RIGHT)
+label_doc = tk.Label(frame1, text="Doc number:", font=FONT, width=12)
+label_doc.grid(row=0, column=2)
 
-label_doc = Label(frame1, text="Doc number:", font=FONT, width=12)
-label_doc.pack(side=RIGHT)
+doc_entry = tk.Entry(frame1, font=FONT, width=5)
+doc_entry.grid(row=0, column=3)
 
+ch_box = tk.Checkbutton(frame1, text="need some changes?", variable=check_var)
+ch_box.grid(row=0, column=4)
 
-frame2 = Frame(root)
+frame2 = tk.Frame(root)
 frame2.pack(pady=5)
 
-ex_button = Button(frame2, text="Load CSV file", font=FONT, command=load_excel, width=20)
+ex_button = tk.Button(frame2, text="Load CSV file", font=FONT, command=load_excel, width=20)
 ex_button.grid(row=1, column=0, padx=5)
 
-label_ex = Label(frame2, textvariable=ex_info, font=FONT, borderwidth=2, relief="groove", width=60, height=1)
+label_ex = tk.Label(frame2, textvariable=ex_info, font=FONT, borderwidth=2, relief="groove", width=60, height=1)
 label_ex.grid(row=1, column=1, padx=5)
 
-pdf_button = Button(frame2, text="Load PDF file", font=FONT, command=load_pdf, width=20)
+pdf_button = tk.Button(frame2, text="Load PDF file", font=FONT, command=load_pdf, width=20)
 pdf_button.grid(row=2, column=0, padx=5)
 
-label_pdf = Label(frame2, textvariable=pdf_info, font=FONT, borderwidth=2, relief="groove", width=60, height=1)
+label_pdf = tk.Label(frame2, textvariable=pdf_info, font=FONT, borderwidth=2, relief="groove", width=60, height=1)
 label_pdf.grid(row=2, column=1, padx=5)
 
-macro_button = Button(frame2, text="Run macro", font=FONT, command=run_macro, width=20)
+macro_button = tk.Button(frame2, text="Run macro", font=FONT, command=run_macro, width=20)
 macro_button.grid(row=3, column=0, padx=5)
 
-label_info = Label(frame2, textvariable=label_message, font=("Arial", 10, "bold"), width=60, height=1)
+label_info = tk.Label(frame2, textvariable=label_message, font=("Arial", 10, "bold"), width=60, height=1)
 label_info.grid(row=3, column=1, padx=5)
 
-data_button = Button(frame2, text="Extract data to PDF", font=FONT, command=write_data_to_pdf, width=20)
+data_button = tk.Button(frame2, text="Extract data to PDF", font=FONT, command=write_data_to_pdf, width=20)
 data_button.grid(row=4, column=0, padx=5)
 
 root.mainloop()
