@@ -222,13 +222,13 @@ label_num = tk.Label(frame1, text="Project number:", font=FONT, width=12)
 label_num.grid(row=0, column=0)
 
 project_entry = tk.Entry(frame1, font=FONT, width=12)
-project_entry.grid(row=0, column=1)
+project_entry.grid(row=0, column=1, padx=(0,20))
 
 label_doc = tk.Label(frame1, text="Doc number:", font=FONT, width=12)
 label_doc.grid(row=0, column=2)
 
 doc_entry = tk.Entry(frame1, font=FONT, width=5)
-doc_entry.grid(row=0, column=3)
+doc_entry.grid(row=0, column=3, padx=(0,50))
 
 ch_box = tk.Checkbutton(frame1, text="need some changes?", variable=check_var)
 ch_box.grid(row=0, column=4)
