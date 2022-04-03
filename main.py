@@ -6,6 +6,7 @@ import os
 import tkinter as tk
 from tkinter import filedialog
 import xlwings as xw
+import xlsxwriter
 
 def load_excel():
     # getting path to CSV file
@@ -22,6 +23,11 @@ def load_pdf():
     label_message.set("")
 
 def run_macro():
+    # creating temp.xlsm file, adding macro from vbaProject.bin
+    workbook = xlsxwriter.Workbook("temp.xlsm")
+    workbook.add_vba_project("vbaProject.bin")
+    workbook.close()
+    # running macro depending on user's choice
     if check_var.get() == 0:
         macro1()
     else:
@@ -30,7 +36,7 @@ def run_macro():
 def macro1():
     # copying data from CSV file to yPDF.xlsm
     projectNum = project_entry.get()
-    wb = xw.Book("yPDF.xlsm")
+    wb = xw.Book("temp.xlsm")
     app = xw.apps.active
     # running macro, saving and closing excel window
     m1 = wb.macro("Module1.yPDF")
@@ -41,8 +47,7 @@ def macro1():
 def macro2():
     # copying data from CSV file to yPDF.xlsm
     projectNum = project_entry.get()
-    wb = xw.Book("yPDF.xlsm")
-    app = xw.apps.active
+    wb = xw.Book("temp.xlsm")
     # running macro
     m2 = wb.macro("Module2.yPDF")
     m2(projectNum, csvpath.name)
@@ -52,7 +57,7 @@ def write_data_to_pdf():
     label_message.set("")
     try:
         # loading yPDF.xlsm file
-        wb = openpyxl.load_workbook("yPDF.xlsm")
+        wb = openpyxl.load_workbook("temp.xlsm")
         sheet = wb[wb.sheetnames[0]]
         num_g = sheet.max_row
 
@@ -178,8 +183,9 @@ def write_data_to_pdf():
             with open(f"{name}-desc.pdf", "wb") as outputStream:
                 output.write(outputStream)
 
-        # deleting temporary PDF file
+        # deleting temporary PDF and XLSM files
         os.remove("temp.pdf")
+        os.remove("temp.xlsm")
         label_message.set(f"File {name}-desc.pdf was created successfully!")
     
     # handling errors
