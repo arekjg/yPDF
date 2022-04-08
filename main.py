@@ -194,7 +194,9 @@ def write_data_to_pdf():
     except NameError:
         label_message.set("At least one of the files is not loaded.")
     except openpyxl.utils.exceptions.InvalidFileException:
-        label_message.set("Please load *.xlsx file.")
+        label_message.set("Please load *.csv file.")
+    except xlsxwriter.exceptions.FileCreateError:
+        label_message.set("Please load *.csv file.")
     except PyPDF2.utils.PdfReadError:
         temp_pdf.close()
         os.remove("temp.pdf")
@@ -204,7 +206,7 @@ def write_data_to_pdf():
         os.remove("temp.pdf")
         label_message.set(f"File {name}-desc.pdf is open. Cannot overwrite.")
     except:
-        label_message.set("Something went wrong :(")
+        label_message.set("Something went wrong, excel file may contain wrong page numbers. Check the 'excel correction' checkbox.")
 
 
 root = tk.Tk()
