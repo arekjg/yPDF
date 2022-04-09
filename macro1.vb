@@ -1,6 +1,6 @@
-Sub yPDF(projectNum As String, filePath As String)
+Sub macro1(projectNum As String, filePath As String)
 '
-' yPDF Makro
+' macro1
 '
 
     'Deleting all existing data from sheet
@@ -35,24 +35,18 @@ Sub yPDF(projectNum As String, filePath As String)
         .Refresh BackgroundQuery:=False
     End With
 
-    'Setting up the variable
-    'Dim projectNum As String
-    
-    'InputBox
-    'projectNum = Application.InputBox("Insert project number", Title:="Project Number", Type:=2)
-    
-    'Additional variables
+    'Setting variables
     char = projectNum & "-"
     projPage = projectNum & "/"
     
-    'Inserting variables to cells
+    'Placing variables in cells
     Range("AM1001") = projPage
     Range("AN1001") = char
        
     'Formulas - finding columns
     Range("R1").Select
     ActiveCell.FormulaR1C1 = _
-        "=IF(OR(" & Chr(10) & "(ISNUMBER(FIND(R1001C39,RC[-17])))," & Chr(10) & "(ISNUMBER(FIND(R1001C40,RC[-17])))" & Chr(10) & ")," & Chr(10) & "1,0)"
+        "=IF(OR((ISNUMBER(FIND(R1001C39,RC[-17]))),(ISNUMBER(FIND(R1001C40,RC[-17])))),1,0)"
     Range("R1").Select
     Selection.AutoFill Destination:=Range("R1:AF1"), Type:=xlFillDefault
     Range("R1:AF1").Select
@@ -63,10 +57,10 @@ Sub yPDF(projectNum As String, filePath As String)
     'Fomulas - counting columns
     Range("AI1").Select
     ActiveCell.FormulaR1C1 = _
-        "=IF(RC[-17]=1,1," & Chr(10) & "IF(RC[-16]=1,2," & Chr(10) & "IF(RC[-15]=1,3," & Chr(10) & "IF(RC[-14]=1,4," & Chr(10) & "IF(RC[-13]=1,5," & Chr(10) & "IF(RC[-12]=1,6," & Chr(10) & "IF(RC[-11]=1,7," & Chr(10) & "IF(RC[-10]=1,8," & Chr(10) & "IF(RC[-9]=1,9," & Chr(10) & "IF(RC[-8]=1,10," & Chr(10) & "IF(RC[-7]=1,11," & Chr(10) & "IF(RC[-6]=1,12," & Chr(10) & "IF(RC[-5]=1,13," & Chr(10) & "IF(RC[-4]=1,14," & Chr(10) & "IF(RC[-3]=1,15," & Chr(10) & "0)))))))))))))))"
+        "=IF(RC[-17]=1,1,IF(RC[-16]=1,2,IF(RC[-15]=1,3,IF(RC[-14]=1,4,IF(RC[-13]=1,5,IF(RC[-12]=1,6,IF(RC[-11]=1,7,IF(RC[-10]=1,8,IF(RC[-9]=1,9,IF(RC[-8]=1,10,IF(RC[-7]=1,11,IF(RC[-6]=1,12,IF(RC[-5]=1,13,IF(RC[-4]=1,14,IF(RC[-3]=1,15,0)))))))))))))))"
     Range("AJ1").Select
     ActiveCell.FormulaR1C1 = _
-        "=16-(IF(RC[-4]=1,1," & Chr(10) & "IF(RC[-5]=1,2," & Chr(10) & "IF(RC[-6]=1,3," & Chr(10) & "IF(RC[-7]=1,4," & Chr(10) & "IF(RC[-8]=1,5," & Chr(10) & "IF(RC[-9]=1,6," & Chr(10) & "IF(RC[-10]=1,7," & Chr(10) & "IF(RC[-11]=1,8," & Chr(10) & "IF(RC[-12]=1,9," & Chr(10) & "IF(RC[-13]=1,10," & Chr(10) & "IF(RC[-14]=1,11," & Chr(10) & "IF(RC[-15]=1,12," & Chr(10) & "IF(RC[-16]=1,13," & Chr(10) & "IF(RC[-17]=1,14," & Chr(10) & "IF(RC[-18]=1,15," & Chr(10) & "0))))))))))))))))"
+        "=16-(IF(RC[-4]=1,1,IF(RC[-5]=1,2,IF(RC[-6]=1,3,IF(RC[-7]=1,4,IF(RC[-8]=1,5,IF(RC[-9]=1,6,IF(RC[-10]=1,7,IF(RC[-11]=1,8,IF(RC[-12]=1,9,IF(RC[-13]=1,10,IF(RC[-14]=1,11,IF(RC[-15]=1,12,IF(RC[-16]=1,13,IF(RC[-17]=1,14,IF(RC[-18]=1,15,0))))))))))))))))"
     Range("AI1:AJ1").Select
     Selection.AutoFill Destination:=Range("AI1:AJ1000"), Type:=xlFillDefault
     Range("AI1:AJ1000").Select
@@ -98,7 +92,7 @@ Sub yPDF(projectNum As String, filePath As String)
     pCount = Application.WorksheetFunction.CountA(Range("A1").EntireColumn)
     Range("C1").Select
     ActiveCell.FormulaR1C1 = _
-        "=SUBSTITUTE(" & Chr(10) & "SUBSTITUTE(" & Chr(10) & "SUBSTITUTE(" & Chr(10) & "SUBSTITUTE(RC[-2],R" & pCount + 1 & "C3,""""),""/00"",""""),""/0"",""""),"" "","""")"
+        "=SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(RC[-2],R" & pCount + 1 & "C3,""""),""/00"",""""),""/0"",""""),"" "","""")"
     Range("C1").Select
     Selection.AutoFill Destination:=Range("C1:C" & pCount), Type:=xlFillDefault
     Range("C1:C" & pCount).Select

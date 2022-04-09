@@ -23,7 +23,7 @@ def load_pdf():
     label_message.set("")
 
 def run_macro():
-    # creating temp.xlsm file, adding macro from vbaProject.bin
+    # creating temp.xlsm file, adding macros from vbaProject.bin
     workbook = xlsxwriter.Workbook("temp.xlsm")
     workbook.add_vba_project("vbaProject.bin")
     workbook.close()
@@ -39,7 +39,7 @@ def macro1():
     wb = xw.Book("temp.xlsm")
     app = xw.apps.active
     # running macro, saving and closing excel window
-    m1 = wb.macro("Module1.yPDF")
+    m1 = wb.macro("Module1.macro1")
     m1(projectNum, csvpath.name)
     wb.save()
     app.quit()
@@ -48,16 +48,23 @@ def macro2():
     # copying data from CSV file to yPDF.xlsm
     projectNum = project_entry.get()
     wb = xw.Book("temp.xlsm")
+    app = xw.apps.active
     # running macro
-    m2 = wb.macro("Module2.yPDF")
+    m2 = wb.macro("Module2.macro2")
     m2(projectNum, csvpath.name)
+    wb.save()
+    app.quit()
+    os.system("start EXCEL.EXE temp.xlsm")
 
 
 def write_data_to_pdf():
     label_message.set("")
     try:
         # loading yPDF.xlsm file
-        wb = openpyxl.load_workbook("temp.xlsm")
+        if check_var.get() == 0:
+            wb = openpyxl.load_workbook("temp.xlsm")
+        else:
+            wb = openpyxl.load_workbook("temp_b.xlsm")
         sheet = wb[wb.sheetnames[0]]
         num_g = sheet.max_row
 
@@ -183,9 +190,11 @@ def write_data_to_pdf():
             with open(f"{name}-desc.pdf", "wb") as outputStream:
                 output.write(outputStream)
 
-        # deleting temporary PDF and XLSM files
+        # deleting temporary files
         os.remove("temp.pdf")
         os.remove("temp.xlsm")
+        if check_var.get() == 1:
+            os.remove("temp_b.xlsm")
         label_message.set(f"File {name}-desc.pdf was created successfully!")
     
     # handling errors
