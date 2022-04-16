@@ -9,22 +9,31 @@ import xlwings as xw
 import xlsxwriter
 
 def load_excel():
-    # getting path to CSV file
-    global csvpath
-    csvpath = filedialog.askopenfile(filetypes = [("CSV files", "*.csv")])
-    ex_info.set(csvpath.name)
-    label_message.set("")
+    try:
+        # getting path to CSV file
+        global csvpath
+        csvpath = filedialog.askopenfile(filetypes = [("CSV files", "*.csv")])
+        ex_info.set(csvpath.name)
+        label_message.set("")
+    except AttributeError:
+        ex_info.set("")
+        label_message.set("File not loaded")
 
 def load_pdf():
-    # getting path to PDF file
-    global pdfpath
-    pdfpath = filedialog.askopenfile(filetypes = [("PDF files", "*.pdf")])
-    pdf_info.set(pdfpath.name)
-    label_message.set("")
+    try:
+        # getting path to PDF file
+        global pdfpath
+        pdfpath = filedialog.askopenfile(filetypes = [("PDF files", "*.pdf")])
+        pdf_info.set(pdfpath.name)
+        label_message.set("")
+    except AttributeError:
+        label_message.set("File not loaded")
+    except NameError:
+        label_message.set("File not loaded")
 
 def run_macro():
     try:
-        csvpath
+        csvpath.name
         # creating temp.xlsm file, adding macros from vbaProject.bin
         workbook = xlsxwriter.Workbook("temp.xlsm")
         workbook.add_vba_project("vbaProject.bin")
@@ -34,7 +43,7 @@ def run_macro():
             macro1()
         else:
             macro2()
-    except NameError:
+    except AttributeError:
         label_message.set("Load CSV file.")
 
 def macro1():
