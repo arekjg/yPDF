@@ -23,15 +23,19 @@ def load_pdf():
     label_message.set("")
 
 def run_macro():
-    # creating temp.xlsm file, adding macros from vbaProject.bin
-    workbook = xlsxwriter.Workbook("temp.xlsm")
-    workbook.add_vba_project("vbaProject.bin")
-    workbook.close()
-    # running macro depending on user's choice
-    if check_var.get() == 0:
-        macro1()
-    else:
-        macro2()
+    try:
+        csvpath
+        # creating temp.xlsm file, adding macros from vbaProject.bin
+        workbook = xlsxwriter.Workbook("temp.xlsm")
+        workbook.add_vba_project("vbaProject.bin")
+        workbook.close()
+        # running macro depending on user's choice
+        if check_var.get() == 0:
+            macro1()
+        else:
+            macro2()
+    except NameError:
+        label_message.set("Load CSV file.")
 
 def macro1():
     # copying data from CSV file to yPDF.xlsm
@@ -56,11 +60,10 @@ def macro2():
     app.quit()
     os.system("start EXCEL.EXE temp.xlsm")
 
-
 def write_data_to_pdf():
     label_message.set("")
     try:
-        # loading yPDF.xlsm file
+        # loading temp.xlsm of temp_b.xlsm file
         if check_var.get() == 0:
             wb = openpyxl.load_workbook("temp.xlsm")
         else:
@@ -150,6 +153,12 @@ def write_data_to_pdf():
                     temp_pdf.cell(int(cell_w*page_w), int((page_h)/36), txt=str((pairs[i+1])[0]), ln=0, border=1, fill=1, align="C")
                     temp_pdf.cell(int(cell_w*page_w), int((page_h)/36), txt=str((pairs[i+1])[1]), ln=0, border=1, fill=1, align="C")
                     temp_pdf.cell(int(cell_w*page_w), int((page_h)/36), txt=str((pairs[i+1])[2]), ln=0, border=1, fill=1, align="C")
+                elif len(pairs[i+1]) == 4:
+                    temp_pdf.cell(int((1-space_left-(4*cell_w))*(page_w)), int((page_h)/36), ln=0)
+                    temp_pdf.cell(int(cell_w*page_w), int((page_h)/36), txt=str((pairs[i+1])[0]), ln=0, border=1, fill=1, align="C")
+                    temp_pdf.cell(int(cell_w*page_w), int((page_h)/36), txt=str((pairs[i+1])[1]), ln=0, border=1, fill=1, align="C")
+                    temp_pdf.cell(int(cell_w*page_w), int((page_h)/36), txt=str((pairs[i+1])[2]), ln=0, border=1, fill=1, align="C")
+                    temp_pdf.cell(int(cell_w*page_w), int((page_h)/36), txt=str((pairs[i+1])[3]), ln=0, border=1, fill=1, align="C")
                 if doc_num == "":
                     pass
                 else:
@@ -170,7 +179,7 @@ def write_data_to_pdf():
             count = existing_pdf.numPages
             output = PdfFileWriter()
 
-            # iteratin through pages, merging pages from two PDF files
+            # iterating through pages, merging pages from two PDF files
             if count == max_page:
                 for i in range(0,count):
                     page = existing_pdf.getPage(i)
@@ -190,6 +199,11 @@ def write_data_to_pdf():
             with open(f"{name}-desc.pdf", "wb") as outputStream:
                 output.write(outputStream)
 
+            # creating plot.txt file with page numbers in it
+            text = (",".join(map(str,keys)))
+            with open("plot.txt", "w") as plot:
+                plot.write(text)
+
         # deleting temporary files
         os.remove("temp.pdf")
         os.remove("temp.xlsm")
@@ -199,17 +213,18 @@ def write_data_to_pdf():
     
     # handling errors
     except ValueError:
+        os.remove("temp.xlsm")
         label_message.set("Insert correct project number.")
     except NameError:
         label_message.set("At least one of the files is not loaded.")
     except openpyxl.utils.exceptions.InvalidFileException:
-        label_message.set("Please load *.csv file.")
+        label_message.set("Load CSV file.")
     except xlsxwriter.exceptions.FileCreateError:
-        label_message.set("Please load *.csv file.")
+        label_message.set("Load CSV file.")
     except PyPDF2.utils.PdfReadError:
         temp_pdf.close()
         os.remove("temp.pdf")
-        label_message.set("Please load *.pdf file.")
+        label_message.set("Load PDF file.")
     except PermissionError:
         temp_pdf.close()
         os.remove("temp.pdf")
@@ -217,9 +232,12 @@ def write_data_to_pdf():
     except:
         label_message.set("Something went wrong, excel file may contain wrong page numbers. Check the 'excel correction' checkbox.")
 
+def do_everything():
+    run_macro()
+    write_data_to_pdf()
 
 root = tk.Tk()
-root.geometry("720x160")
+root.geometry("730x170")
 root.title("yPDF")
 root.resizable(False, False)
 
@@ -230,7 +248,7 @@ check_var = tk.IntVar()
 
 FONT = ("Arial", 10)
 
-frame1 = tk.Frame(root, width=400, height=28)
+frame1 = tk.Frame(root, width=500, height=28)
 frame1.pack()
 frame1.pack_propagate(0)
 
@@ -239,16 +257,16 @@ label_num = tk.Label(frame1, text="Project number:", font=FONT, width=12)
 label_num.grid(row=0, column=0)
 
 project_entry = tk.Entry(frame1, font=FONT, width=12)
-project_entry.grid(row=0, column=1, padx=(0,20))
+project_entry.grid(row=0, column=1, padx=(0,35))
 
-label_doc = tk.Label(frame1, text="Doc number:", font=FONT, width=12)
+label_doc = tk.Label(frame1, text="Doc number:", font=FONT, width=10)
 label_doc.grid(row=0, column=2)
 
 doc_entry = tk.Entry(frame1, font=FONT, width=5)
-doc_entry.grid(row=0, column=3, padx=(0,50))
+doc_entry.grid(row=0, column=3, padx=(0,45))
 
-ch_box = tk.Checkbutton(frame1, text="need some changes?", variable=check_var)
-ch_box.grid(row=0, column=4)
+ch_box = tk.Checkbutton(frame1, text="change something in excel", variable=check_var)
+ch_box.grid(row=0, column=4, padx=(0,30))
 
 frame2 = tk.Frame(root)
 frame2.pack(pady=5)
@@ -256,22 +274,31 @@ frame2.pack(pady=5)
 ex_button = tk.Button(frame2, text="Load CSV file", font=FONT, command=load_excel, width=20)
 ex_button.grid(row=1, column=0, padx=5)
 
-label_ex = tk.Label(frame2, textvariable=ex_info, font=FONT, borderwidth=2, relief="groove", width=60, height=1)
+label_ex = tk.Label(frame2, textvariable=ex_info, font=FONT, borderwidth=2, relief="groove", width=62, height=1)
 label_ex.grid(row=1, column=1, padx=5)
 
 pdf_button = tk.Button(frame2, text="Load PDF file", font=FONT, command=load_pdf, width=20)
 pdf_button.grid(row=2, column=0, padx=5)
 
-label_pdf = tk.Label(frame2, textvariable=pdf_info, font=FONT, borderwidth=2, relief="groove", width=60, height=1)
+label_pdf = tk.Label(frame2, textvariable=pdf_info, font=FONT, borderwidth=2, relief="groove", width=62, height=1)
 label_pdf.grid(row=2, column=1, padx=5)
 
-macro_button = tk.Button(frame2, text="Run macro", font=FONT, command=run_macro, width=20)
-macro_button.grid(row=3, column=0, padx=5)
+frame3 = tk.Frame(root)
+frame3.pack()
 
-label_info = tk.Label(frame2, textvariable=label_message, font=("Arial", 10, "bold"), width=60, height=1)
-label_info.grid(row=3, column=1, padx=5)
+macro_button = tk.Button(frame3, text="Run macro", font=FONT, command=run_macro, width=20)
+macro_button.grid(row=0, column=0)
 
-data_button = tk.Button(frame2, text="Extract data to PDF", font=FONT, command=write_data_to_pdf, width=20)
-data_button.grid(row=4, column=0, padx=5)
+data_button = tk.Button(frame3, text="Write data to PDF", font=FONT, command=write_data_to_pdf, width=20)
+data_button.grid(row=0, column=1)
+
+ev_button = tk.Button(frame3, text="Do everything", font=FONT, command=do_everything, width=20)
+ev_button.grid(row=0, column=2)
+
+frame4 = tk.Frame(root)
+frame4.pack(pady=(5,0))
+
+label_info = tk.Label(frame4, textvariable=label_message, font=("Arial", 10, "bold"), width=80, height=2, wraplength=500)
+label_info.grid(row=0, column=0)
 
 root.mainloop()
