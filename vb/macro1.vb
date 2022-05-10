@@ -117,5 +117,19 @@ Sub macro1(projectNum As String, filePath As String)
     Columns("C:C").Select
     Selection.Delete Shift:=xlToLeft
     
-    
+    'Sorting alphabetically by column B
+    Columns("A:B").Select
+    Range("B1").Activate
+    ActiveWorkbook.Worksheets("Sheet1").sort.SortFields.Clear
+    ActiveWorkbook.Worksheets("Sheet1").sort.SortFields.Add Key:=Range("B1"), _
+        SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
+    With ActiveWorkbook.Worksheets("Sheet1").sort
+        .SetRange Range("A1:B" & pCount)
+        .Header = xlNo
+        .MatchCase = False
+        .Orientation = xlTopToBottom
+        .SortMethod = xlPinYin
+        .Apply
+    End With
+
 End Sub

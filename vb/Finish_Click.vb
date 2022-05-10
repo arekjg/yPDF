@@ -20,6 +20,21 @@ Sub Finish_Click()
     Columns("C:I").Select
     Selection.Delete Shift:=xlToLeft
 
+    'Sorting alphabetically by column B
+    Columns("A:B").Select
+    Range("B1").Activate
+    ActiveWorkbook.Worksheets("Sheet1").sort.SortFields.Clear
+    ActiveWorkbook.Worksheets("Sheet1").sort.SortFields.Add Key:=Range("B1"), _
+        SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
+    With ActiveWorkbook.Worksheets("Sheet1").sort
+        .SetRange Range("A1:B" & pCount)
+        .Header = xlNo
+        .MatchCase = False
+        .Orientation = xlTopToBottom
+        .SortMethod = xlPinYin
+        .Apply
+    End With
+
     'Saving and closing
     Application.DisplayAlerts = False
     Workbooks("temp.xlsm").SaveAs FileName:= Workbooks("temp.xlsm").Path & "\temp_b.xlsm"
