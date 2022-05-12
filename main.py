@@ -7,6 +7,7 @@ import tkinter as tk
 from tkinter import filedialog
 import xlwings as xw
 import xlsxwriter
+from itertools import groupby
 
 def load_excel():
     try:
@@ -68,6 +69,12 @@ def macro2():
     wb.save()
     app.quit()
     os.system("start EXCEL.EXE temp.xlsm")
+
+def ranges(i):
+    # grouping function
+    for a, b in groupby(enumerate(i), lambda pair: pair[1] - pair[0]):
+        b = list(b)
+        yield b[0][1], b[-1][1]
 
 def write_data_to_pdf():
     label_message.set("")
@@ -208,17 +215,25 @@ def write_data_to_pdf():
             with open(f"{name}-desc.pdf", "wb") as outputStream:
                 output.write(outputStream)
 
-            # creating plot.txt file with page numbers in it
-            text = (",".join(map(str,keys)))
-            with open("plot.txt", "w") as plot:
-                plot.write(text)
-
         # deleting temporary files
         os.remove("temp.pdf")
         os.remove("temp.xlsm")
         if check_var.get() == 1:
             os.remove("temp_b.xlsm")
         label_message.set(f"File {name}-desc.pdf was created successfully!")
+
+        # creating plot.txt file
+        grouped_keys = list(ranges(keys))
+        plot_list = []
+        for i in range(len(grouped_keys)):
+            if grouped_keys[i][0] == grouped_keys[i][1]:
+                plot_list.append(f"{grouped_keys[i][0]}")
+            else:
+                plot_list.append(f"{grouped_keys[i][0]}-{grouped_keys[i][1]}")
+        plot_text = (",".join(map(str,plot_list)))
+
+        with open("plot.txt", "w") as plot:
+            plot.write(plot_text)
     
     # handling errors
     except ValueError:
