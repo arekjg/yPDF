@@ -29,7 +29,13 @@ Private Sub AddBtn_Click()
             Range("A" & pCount + 1) = pageVal
             Range("C" & pCount + 1) = pageVal
             Range("B" & pCount + 1).Select
-            ActiveCell.FormulaR1C1 = "=VLOOKUP(RC[-1],C[-1]:C,2,FALSE)"
+
+            For x = 1 To pCount
+                If Range("C" & x).Value = (pageVal - 1) Then
+                    Range("B" & pCount + 1) = Range("B" & x).Value
+                End If
+            Next x
+
         End If
     End If
 
