@@ -212,7 +212,7 @@ def write_data_to_pdf():
 
             # saving output file
             name = os.path.splitext(os.path.basename(pdfpath.name))[0]
-            with open(f"{name}-desc.pdf", "wb") as outputStream:
+            with open(f"{name}", "wb") as outputStream:
                 output.write(outputStream)
 
         # deleting temporary files
@@ -220,7 +220,7 @@ def write_data_to_pdf():
         os.remove("temp.xlsm")
         if check_var.get() == 1:
             os.remove("temp_b.xlsm")
-        label_message.set(f"File {name}-desc.pdf was created successfully!")
+        label_message.set(f"File {name}.pdf was created successfully!")
 
         # creating plot.txt file
         grouped_keys = list(ranges(keys))
@@ -232,7 +232,7 @@ def write_data_to_pdf():
                 plot_list.append(f"{grouped_keys[i][0]}-{grouped_keys[i][1]}")
         plot_text = (",".join(map(str,plot_list)))
 
-        with open("plot.txt", "w") as plot:
+        with open(f"{name}.txt", "w") as plot:
             plot.write(plot_text)
     
     # handling errors
@@ -252,7 +252,7 @@ def write_data_to_pdf():
     except PermissionError:
         temp_pdf.close()
         os.remove("temp.pdf")
-        label_message.set(f"File {name}-desc.pdf is open. Cannot overwrite.")
+        label_message.set(f"File {name}.pdf is open. Cannot overwrite.")
     except:
         label_message.set("Something went wrong, excel file may contain wrong page numbers. Check the 'excel correction' checkbox.")
 
