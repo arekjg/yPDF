@@ -212,7 +212,7 @@ def write_data_to_pdf():
 
             # saving output file
             name = os.path.splitext(os.path.basename(pdfpath.name))[0]
-            with open(f"{name}", "wb") as outputStream:
+            with open(f"{name}.pdf", "wb") as outputStream:
                 output.write(outputStream)
 
         # deleting temporary files
